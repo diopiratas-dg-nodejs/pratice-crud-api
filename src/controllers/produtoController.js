@@ -3,8 +3,22 @@ const Produto = db.Produto;
 
 const produtoController = {
     list: (req, res) => {
+        req.query.category ?
+        Produto.findAll({
+            where: 
+            {               
+                category: {[db.Sequelize.Op.eq] : `${req.query.category}`}
+            }
+        })
+        .then(produtos => {            
+            res.status(200).json(produtos)
+        })
+        .catch(err => {
+            res.status(500).json(err); // 500 = Internal Error
+        })
+        :
         Produto.findAll()
-            .then(produtos => {
+            .then(produtos => {                
                 res.status(200).json(produtos)
             })
             .catch(err => {
@@ -26,12 +40,12 @@ const produtoController = {
         })
     },
     create: async (req, res) => {
-        const produto = req.body
+        const produto = req.body        
         try {
           await Produto.create(produto)
           res.status(201).json({ msg: 'Produto criado com sucesso!' })
         } catch (err) {
-          res.status(400).json({ error: [...err] }) // 400 = Bad Request
+          res.status(400).json(err) // 400 = Bad Request
         }
     }, 
 
@@ -42,7 +56,7 @@ const produtoController = {
         await Produto.update(produto, { where: { id } })
         res.status(201).json({ msg: 'Produto alterado com sucesso!' })
       } catch (err) {
-        res.status(304).json({ error: [...err] }) // 304 = Not Modified
+        res.status(304).json(err) // 304 = Not Modified
       }
     },
     
@@ -82,7 +96,7 @@ const produtoController = {
             res.status(201).json({ msg: 'Produto alterado com sucesso!' })
           
         } catch (err) {
-          res.status(304).json({ error: [...err] }) // 304 = Not Modified
+          res.status(304).json(err) // 304 = Not Modified
         }
     },
 
@@ -92,7 +106,7 @@ const produtoController = {
         await Produto.destroy({ where: { id } })
         res.status(200).json({ msg: 'Produto excluído com sucesso!' })
       } catch (err) {
-        res.status(400).json({ error: [...err] })
+        res.status(400).json(err)
       }
     }
 }
